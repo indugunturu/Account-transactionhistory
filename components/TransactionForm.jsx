@@ -37,14 +37,18 @@ function TransactionForm({ onTransactionSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("account", formData.account_id);
+ //   if (validateForm()) {
+  const isHEX = (ch) => "0123456789abcdef".includes(ch.toLowerCase());
+
+  const isGuidValid = (guid) => {
+    guid = guid.replaceAll("-", ""); // Format it first!
+    return guid.length === 32 && [...guid].every(isHEX);
+  };      console.log("account", formData.account_id);
       const uuid = uuidv4({
         random: [...Array(16)].map(() => formData.account_id),
       });
-      //  formData = {account_id: uuid, amount: formData.amount}
       axios
-        .post(updateURL, { account_id: uuid, amount: formData.amount })
+        .post(updateURL, { account_id: isGuidValid(formData.account_id) ? formData.account_id: uuid, amount: formData.amount })
         .then((response) => {
           onTransactionSubmit(formData);
           console.log("Data updated successfully", response.data);
@@ -56,7 +60,7 @@ function TransactionForm({ onTransactionSubmit }) {
         });
 
       setFormData({ account_id: "", amount: "" }); // clear form after submit
-    }
+  //  }
   };
 
   return (
